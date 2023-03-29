@@ -6,7 +6,11 @@ import java.lang.invoke.MethodHandles;
 public class Solver {// the solver will input a board and result in movements
 	// piorityQueue;
 	public int hashCode(){
+		return 0;
 	}
+	public static int[][] goal;
+
+	public static
 
 	public static void main(String[] args) {
 		System.out.println("number of arguments: " + args.length);
