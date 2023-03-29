@@ -63,7 +63,7 @@ public class Vertex {
             int temp;
             for (int i = 0; i < this.board.length; i++) {
                 temp_puz[i] = Arrays.copyOf(this.board[i], this.board.length);
-            }x
+            }
             temp = temp_puz[x2][y2];
             temp_puz[x2][y2] = temp_puz[x1][y1];
             temp_puz[x1][y1] = temp;
