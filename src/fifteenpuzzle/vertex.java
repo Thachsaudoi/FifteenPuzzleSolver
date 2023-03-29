@@ -8,7 +8,7 @@ public class Vertex {
     private int[][] board;
     private int heuristic;
     private int distanceFromStart;
-    private int f;
+    private int f;// fi will be thie price of the
     private int[][] goal;
     private int[] blankPos;
 
