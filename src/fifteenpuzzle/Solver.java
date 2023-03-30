@@ -1,3 +1,4 @@
+
 package fifteenpuzzle;
 
 import java.io.BufferedReader;
@@ -48,21 +49,24 @@ public class Solver {// the solver will input a board and result in movements
 		// TODO
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
 		SIZE = (int) br.read() -'0';
-		br.readLine();
+
+		String a = br.readLine();
 		System.out.println(SIZE);
 
 		int[][] board = new int[SIZE][SIZE];
 		int c1, c2, s;
 
 		for (int i = 0; i < SIZE; i++) {
+			int count = 0;
 			for (int j = 0; j < SIZE; j++) {
 				c1 = br.read();
 				c2 = br.read();
-				s = br.read(); // skip the space
-				if (s != ' ' && s != '\n') {
-					br.close();
-					throw new BadBoardException("error in line " + i);
-				}
+				s = br.read();
+				count++;
+				if (count == SIZE) {
+					br.readLine();
+				} // skip the space
+
 				if (c1 == ' ')
 					c1 = '0';
 				if (c2 == ' ')
@@ -73,6 +77,7 @@ public class Solver {// the solver will input a board and result in movements
 		//checkBoard(board);
 		br.close();
 		System.out.println(Arrays.deepToString(board));
+
 		//File input = new File(args[0]);
 		// solve..
 		//File output = new File(args[1]);
