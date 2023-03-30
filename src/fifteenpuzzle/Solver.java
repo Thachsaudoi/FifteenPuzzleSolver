@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 
 public class Solver {// the solver will input a board and result in movements
 	// piorityQueue;
@@ -45,8 +46,10 @@ public class Solver {// the solver will input a board and result in movements
 		}
 
 		// TODO
-		BufferedReader br = new BufferedReader(new FileReader(args));
-		SIZE = (int) br.read();
+		BufferedReader br = new BufferedReader(new FileReader(args[0]));
+		SIZE = (int) br.read() -'0';
+		br.readLine();
+		System.out.println(SIZE);
 
 		int[][] board = new int[SIZE][SIZE];
 		int c1, c2, s;
@@ -67,10 +70,11 @@ public class Solver {// the solver will input a board and result in movements
 				board[i][j] = 10 * (c1 - '0') + (c2 - '0');
 			}
 		}
-		checkBoard(board);
+		//checkBoard(board);
 		br.close();
+		System.out.println(Arrays.deepToString(board));
 		//File input = new File(args[0]);
-		// solve...
+		// solve..
 		//File output = new File(args[1]);
 
 	}
