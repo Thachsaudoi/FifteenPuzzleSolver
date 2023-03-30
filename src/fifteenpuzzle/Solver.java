@@ -73,6 +73,7 @@ public class Solver {// the solver will input a board and result in movements
 		//checkBoard(board);
 		br.close();
 		System.out.println(Arrays.deepToString(board));
+
 		//File input = new File(args[0]);
 		// solve..
 		//File output = new File(args[1]);
