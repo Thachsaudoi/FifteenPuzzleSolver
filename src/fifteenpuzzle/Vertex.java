@@ -139,7 +139,7 @@ public class Vertex implements Comparable<Vertex>{
         // Store the goal positions of each number in a map for O(1) lookup
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                goalPositions.put(goal[i][j], new int[]{i, j});
+                goalPositions.put(goal[i][j], new int[]{i, j}); // good
             }
         }
 
@@ -147,9 +147,6 @@ public class Vertex implements Comparable<Vertex>{
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 int num = board[i][j];
-                if (num == 0) {
-                    continue;
-                }
                 int[] goalPos = goalPositions.get(num);
                 distance += Math.abs(i - goalPos[0]) + Math.abs(j - goalPos[1]);
             }
@@ -177,7 +174,6 @@ public class Vertex implements Comparable<Vertex>{
 
     @Override
     public int compareTo(Vertex other) {
-
         if (other.f == this.f) {
             return Integer.compare(this.getDistanceFromStart(), other.getDistanceFromStart());
         }

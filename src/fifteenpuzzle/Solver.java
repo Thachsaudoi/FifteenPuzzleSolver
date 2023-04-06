@@ -204,16 +204,18 @@ public class Solver {// the solver will input a board and result in movements
 		while (!q.isEmpty()) {
 			Vertex curr = q.remove();
 			if (solvable(curr.getBoard())) {
-				System.out.println("Next move: " + curr.getMove());
+
 				ArrayList<Vertex> neighbors = curr.generateChild();
 //				System.out.println("---------------------------------------");
-//				for (Vertex u : neighbors) {
+				//for (Vertex u : neighbors) {
 //					System.out.print(u.getMove() + ": ");
 //					System.out.println(Arrays.deepToString(u.getBoard()));
-//					u.setHeuristic(u.getHeuristic(goal));
-//					u.setF(u.getF());
-//					System.out.println("f value : " + u.getF());
-//				}
+				//	u.setHeuristic(u.getHeuristic(goal));
+				//	u.setF(u.getF());
+//						System.out.println("heuristic : " + u.getHeuristic(goal));
+//						System.out.println("cost : " + u.getDistanceFromStart());
+//						System.out.println("f value : " + u.getF());
+				//}
 //				System.out.println("---------------------------------------");
 				for (Vertex u:neighbors) {
 					u.setHeuristic(u.getHeuristic(goal));
@@ -221,7 +223,7 @@ public class Solver {// the solver will input a board and result in movements
 					if (u.getHashCode() == goalVertex.getHashCode()) {
 						u.setParent(curr);
 						result = u;
-						return result; //Maybe change later
+						return result; // if the solution came out then return
 					} else {
 						if (q.contains(u)) {
 							for (Vertex i:q) {
