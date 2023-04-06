@@ -16,6 +16,47 @@ public class Solver {// the solver will input a board and result in movements
 	public static int SIZE; // the size of the board
 	public static int[][] goal;
 
+	public static boolean solvable(Vertex temp){
+		int[][] board = temp.getBoard();
+		int[] flattened = new int[board.length * board[0].length - 1]; // ignore empty cell
+		int k = 0;
+		int blank = 0;
+		//turn 2D into 1D array
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[0].length; j++) {
+				if (board[i][j] != 0) {
+					flattened[k] = board[i][j];
+					k++;
+				}
+			}
+		}
+		int inversions = 0;
+
+		//get inversion
+		for (int i = 0; i < flattened.length - 1; i++) {
+			for (int j = i + 1; j < flattened.length; j++) {
+				if (flattened[j] != 0 && flattened[i] != 0 && flattened[i] > flattened[j])  {
+					inversions++;
+				}
+			}
+		}
+
+		//get the x position
+		for(int i = board.length -1 ; i>= 0  ; i-- ){
+			for(int j = board.length-1 ; j >= 0 ; j--)
+				if (board[i][j] == 0 )
+					blank = board.length - 1 ;
+		}
+		if (board.length % 2 == 1 )  return inversions % 2 == 0 ;
+		else{
+			if (blank%2 ==1){
+				return inversions % 2 ==0;
+			}
+			return inversions % 2 ==1;
+		}
+
+	}
+
 	public static void main(String[] args) throws BadBoardException, IOException {
 
 		System.out.println("number of arguments: " + args.length);
@@ -31,24 +72,23 @@ public class Solver {// the solver will input a board and result in movements
 
 		// TODO
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
-		SIZE = br.read() - '0';
+		SIZE = (int) br.read() -'0';
 
-		br.readLine();
+		String a = br.readLine();
+		System.out.println(SIZE);
 
 		int[][] board = new int[SIZE][SIZE];
-		int c1, c2;
+		int c1, c2, s;
 
 		for (int i = 0; i < SIZE; i++) {
-			int count = 0;
 			for (int j = 0; j < SIZE; j++) {
 				c1 = br.read();
 				c2 = br.read();
-				count++;
-				br.read();// skip the space
-				if (count == SIZE) {
-					br.readLine();
+				s = br.read(); // skip the space
+				if (s != ' ' && s != '\n') {
+					br.close();
+					throw new BadBoardException("error in line " + i);
 				}
-
 				if (c1 == ' ')
 					c1 = '0';
 				if (c2 == ' ')
@@ -58,7 +98,12 @@ public class Solver {// the solver will input a board and result in movements
 		}
 		//checkBoard(board);
 		br.close();
+
+		//File input = new File(args[0]);
+		// solve..
+		//File output = new File(args[1]);
 		System.out.println(Arrays.deepToString(board));
+
 		goal = new int[SIZE][SIZE];
 		int index = 1;
 
@@ -73,11 +118,12 @@ public class Solver {// the solver will input a board and result in movements
 			}
 		}
 
+
 //		System.out.println("Goal board:");
 //		System.out.println(Arrays.deepToString(goal));
 		Vertex b = solve(board);
 		Stack<String> resultList = new Stack<>();
-		while (b.getParent() != null) {
+		while (b != null) {
 			resultList.add(b.getMove());
 			b = b.getParent();
 		}
@@ -124,69 +170,80 @@ public class Solver {// the solver will input a board and result in movements
 			for (Vertex i : q) {
 				i.setHeuristic(i.getHeuristic(goal));
 				i.setF(i.getF());
-				System.out.println(i.getMove());
+//				System.out.println(i.getMove());
+				System.out.println(Arrays.deepToString(i.getBoard()));
 				System.out.println("f value : " + i.getF());
 				System.out.println("cost: " + i.getDistanceFromStart());
-				System.out.println("hash: "+ i.getHashCode());
+//				System.out.println("hash: "+ i.getHashCode());
 			}
 			System.out.println("End queue--------");
 			Vertex node = q.remove();
+			if (solvable(node)){
 
-			//TESTING : printing the node that popped out
-			System.out.println("Popped out :  " + node.getMove());
-			System.out.println("cost: " + node.getDistanceFromStart());
-			System.out.println("f value : " + node.getF());
-
-
-
-			if (node.getHashCode() == goalVertex.getHashCode()) {
-				result = node;
+				if (node.getHashCode() == goalVertex.getHashCode()) {
+					result = node;
 //				System.out.println("we have result");
-				return result;
-			}
-
-			closed.add(node.getHashCode());
-
-			System.out.println("-------------------------------");
-			for (Vertex neighbor : node.generateChild()) {
-				if (closed.contains(neighbor.getHashCode())) {
-					continue;
+					return result;
 				}
-				neighbor.setHeuristic(neighbor.getHeuristic(goal));
-				neighbor.setF(neighbor.getF());
 
-				//TESTING : printing out the neighbour
+				closed.add(node.getHashCode());
+
+				System.out.println("-------------------------------");
+				for (Vertex neighbor : node.generateChild()) {
+					if (closed.contains(neighbor.getHashCode())) {
+						continue;
+					}
+					neighbor.setHeuristic(neighbor.getHeuristic(goal));
+					neighbor.setF(neighbor.getF());
+
+					//TESTING : printing out the neighbour
 //				System.out.print(neighbor.getMove() + ": ");
 //				System.out.println(Arrays.deepToString(neighbor.getBoard()));
 //				System.out.println("f value : " + neighbor.getF());
 //				System.out.println("cost: " + neighbor.getDistanceFromStart());
 
 
-				if (!closed.contains(neighbor.getHashCode())) {
-					if (queueContains(q, neighbor)) {
-						Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
-						System.out.println("duma cai lon ma");
-						if (openNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
+					if (!closed.contains(neighbor.getHashCode())) {
+						if (queueContains(q, neighbor)) {
+							Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
+							System.out.println("duma cai lon ma");
+							if (openNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
 
-							/////////////////////////
-							System.out.println("We have NEIGHJDAD");
-							q.remove(openNeighbor);
+								/////////////////////////
+								System.out.println("We have NEIGHJDAD");
+								q.remove(openNeighbor);
+								neighbor.setParent(node);
+								q.add(neighbor);
+//							System.out.println("open neighbor: " + openNeighbor.getMove());
+//							System.out.println("open f" + openNeighbor.getF());
+//							System.out.println("neighbor: " + neighbor.getMove());
+//							System.out.println("neighbor f" + neighbor.getF());
+
+							}
+						} else {
 							neighbor.setParent(node);
 							q.add(neighbor);
-							System.out.println("open neighbor: " + openNeighbor.getMove());
-							System.out.println("open f" + openNeighbor.getF());
-							System.out.println("neighbor: " + neighbor.getMove());
-							System.out.println("neighbor f" + neighbor.getF());
-
 						}
-					} else {
-						neighbor.setParent(node);
-						q.add(neighbor);
 					}
 				}
+				System.out.println("-------------------------------");
 			}
-			System.out.println("-------------------------------");
-		}
+			else{
+				System.out.println("duma unsolvable*********************");
+				System.out.println(Arrays.deepToString(node.getBoard()));
+			}
+
+
+			}
+
+			//TESTING : printing the node that popped out
+//			System.out.println("Popped out :  " + node.getMove());
+//			System.out.println("cost: " + node.getDistanceFromStart());
+//			System.out.println("f value : " + node.getF());
+
+
+
+
 		return null;
 	}
 }
