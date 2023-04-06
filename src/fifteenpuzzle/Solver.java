@@ -118,8 +118,6 @@ public class Solver {// the solver will input a board and result in movements
 
 
 		Vertex b = solve(board);
-//		int[][] o = {{1,2,3},{4,5,6},{7,8,0}};
-//		System.out.println(solvable(o));
 		Stack<String> resultList = new Stack<>();
 		while (b != null) {
 			resultList.add(b.getMove());
@@ -208,15 +206,15 @@ public class Solver {// the solver will input a board and result in movements
 			if (solvable(curr.getBoard())) {
 				System.out.println("Next move: " + curr.getMove());
 				ArrayList<Vertex> neighbors = curr.generateChild();
-				System.out.println("---------------------------------------");
-				for (Vertex u : neighbors) {
-					System.out.print(u.getMove() + ": ");
-					System.out.println(Arrays.deepToString(u.getBoard()));
-					u.setHeuristic(u.getHeuristic(goal));
-					u.setF(u.getF());
-					System.out.println("f value : " + u.getF());
-				}
-				System.out.println("---------------------------------------");
+//				System.out.println("---------------------------------------");
+//				for (Vertex u : neighbors) {
+//					System.out.print(u.getMove() + ": ");
+//					System.out.println(Arrays.deepToString(u.getBoard()));
+//					u.setHeuristic(u.getHeuristic(goal));
+//					u.setF(u.getF());
+//					System.out.println("f value : " + u.getF());
+//				}
+//				System.out.println("---------------------------------------");
 				for (Vertex u:neighbors) {
 					u.setHeuristic(u.getHeuristic(goal));
 					u.setF(u.getF());

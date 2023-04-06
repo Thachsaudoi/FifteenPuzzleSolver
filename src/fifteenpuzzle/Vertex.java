@@ -162,18 +162,6 @@ public class Vertex implements Comparable<Vertex>{
     public boolean equals(Object other) {
         return ((Vertex) other).getHashCode() == this.getHashCode();
     }
-    //    public int getHeuristic(int[][] goalBoard){
-//        int distance = 0;
-//        for (int i =0; i < this.boardLength; i++) {
-//            for (int j = 0; j < this.boardLength; j++) {
-//                int[] coordinates = this.getCoordinate(this.board[i][j], goalBoard);
-//                int i1 = coordinates[0];
-//                int j1 = coordinates[1];
-//                distance += Math.abs(i - i1) + Math.abs(j - j1);
-//            }
-//        }
-//        return distance;
-//    }
 
     public void findBlankPos() {
         for (int i = 0; i < this.boardLength; i++) {
@@ -191,13 +179,8 @@ public class Vertex implements Comparable<Vertex>{
     public int compareTo(Vertex other) {
 
         if (other.f == this.f) {
-//          System.out.println("other f " + other.f + " this f " + this.f);
-//          System.out.println(" this get dist " + this.getDistanceFromStart() + " , other get dist " + other.getDistanceFromStart());
-//          System.out.println(Integer.compare(this.getDistanceFromStart(), other.getDistanceFromStart()));
             return Integer.compare(this.getDistanceFromStart(), other.getDistanceFromStart());
         }
-
-//        return other.f < this.f ? 1 : -1;
         return Integer.compare(this.getF(), other.getF());
     }
 
