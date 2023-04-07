@@ -115,7 +115,7 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     public int getF() {
-        return this.heuristic + this.distanceFromStart; // if we make constructor put this in.
+        return this.heuristic ; // if we make constructor put this in.
     }
 
     public int[] getCoordinate(int tile, int[][] position) {

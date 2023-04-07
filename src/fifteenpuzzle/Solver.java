@@ -96,7 +96,8 @@ public class Solver {// the solver will input a board and result in movements
 		//********** THIS IS WHERE A* STARTED*********************
 
 
-		HashSet<Integer> closed = new HashSet<>();
+//		HashSet<Integer> closed = new HashSet<>();
+		HashMap<Integer,Integer> closed = new HashMap<>();
 		PriorityQueue<Vertex> q = new PriorityQueue<>();
 		q.add(startState);
 		Vertex goalVertex = new Vertex(goal);
@@ -105,7 +106,6 @@ public class Solver {// the solver will input a board and result in movements
 		while (!q.isEmpty()) {
 			Vertex node = q.remove();
 			countPop++;
-
 			for (Vertex neighbor : node.generateChild()) {
 				neighbor.setHeuristic(neighbor.getHeuristic(goal));
 				neighbor.setF(neighbor.getF());
@@ -121,31 +121,34 @@ public class Solver {// the solver will input a board and result in movements
 					if (queueContains(q, neighbor)) {
 						// it did go inside here
 						Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
-						if (openNeighbor.getF() > neighbor.getF()) {
+						if (openNeighbor.compareTo(neighbor) > 0) { // barely go inside here
 							System.out.println("hello world");
 							// the problem is the thing never go inside here
-
+							System.out.println("below");
+							System.out.println(openNeighbor.getF());
+							System.out.println(neighbor.getF());
 							q.remove(openNeighbor);
 							neighbor.setParent(node);
 							q.add(neighbor);
-//							System.out.println("open neighbor: " + openNeighbor.getMove());
-//							System.out.println("open f" + openNeighbor.getF());
-//							System.out.println("neighbor: " + neighbor.getMove());
-//							System.out.println("neighbor f" + neighbor.getF());
 
 						}
 					}
-//					else if ( closed.contains(neighbor.getHashCode())){
-//						// so if the one in the closed has higher fu then update the fu then move it back to the open queue
-//
-//					}
+					else if ( closed.containsKey(neighbor.getHashCode())){
+						// so if the one in the closed has higher fu then update the fu then move it back to the open queue
+						if (closed.get(neighbor.getHashCode()).compareTo(neighbor.getF())> 0){// barely go inside here
+							q.add(neighbor);
+							neighbor.setParent(node);
+							System.out.println("went here wentttt");
+						}
+
+					}
 					else {
 						neighbor.setParent(node);
 						q.add(neighbor);
 					}
 				}
 			}
-			closed.add(node.getHashCode()); // this line is moving node to the close set
+			closed.put(node.getHashCode(), node.getF()); // this line is moving node to the close set
 
 		}
 		return null;
