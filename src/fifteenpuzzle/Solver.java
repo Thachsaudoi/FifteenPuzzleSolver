@@ -16,50 +16,10 @@ public class Solver {// the solver will input a board and result in movements
 	public static int SIZE; // the size of the board
 	public static int[][] goal;
 
-	public static boolean solvable(int[][] arr2D)
-	{
-		int[] puzzle = new int[arr2D.length * arr2D[0].length];
-		int index = 0;
-		for (int i = 0; i < arr2D.length; i++) {
-			for (int j = 0; j < arr2D[0].length; j++) {
-				puzzle[index++] = arr2D[i][j];
-			}
-		}
-		int parity = 0;
-		int gridWidth = (int) Math.sqrt(puzzle.length);
-		int row = 0; // the current row we are on
-		int blankRow = 0; // the row with the blank tile
 
-		for (int i = 0; i < puzzle.length; i++)
-		{
-			if (i % gridWidth == 0) { // advance to next row
-				row++;
-			}
-			if (puzzle[i] == 0) { // the blank tile
-				blankRow = row; // save the row on which encountered
-				continue;
-			}
-			for (int j = i + 1; j < puzzle.length; j++)
-			{
-				if (puzzle[i] > puzzle[j] && puzzle[j] != 0)
-				{
-					parity++;
-				}
-			}
-		}
-
-		if (gridWidth % 2 == 0) { // even grid
-			if (blankRow % 2 == 0) { // blank on odd row; counting from bottom
-				return parity % 2 == 0;
-			} else { // blank on even row; counting from bottom
-				return parity % 2 != 0;
-			}
-		} else { // odd grid
-			return parity % 2 == 0;
-		}
-	}
 
 	public static void main(String[] args) throws BadBoardException, IOException {
+		long startTime = System.currentTimeMillis();
 
 		System.out.println("number of arguments: " + args.length);
 		for (int i = 0; i < args.length; i++) {
@@ -128,15 +88,28 @@ public class Solver {// the solver will input a board and result in movements
 		while (!resultList.isEmpty()) {
 			System.out.println(resultList.pop());
 		}
+
+
+		// Your code here
+
+		long endTime = System.currentTimeMillis();
+		long runtime = endTime - startTime;
+		if ( runtime > 30000) {
+			System.out.println("run time exceeed");
+			return ;
+		}
+		System.out.println("Runtime: " + runtime + "ms");
 	}
 
-	public static boolean queueContains(PriorityQueue<Vertex> queue, Vertex neighbor) {
+
+
+	public static Vertex queueContains(PriorityQueue<Vertex> queue, Vertex neighbor) {
 		for (Vertex i : queue) {
 			if (neighbor.equals(i)) {
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public static Vertex solve(int[][] start) {
@@ -144,115 +117,73 @@ public class Solver {// the solver will input a board and result in movements
 		startState.setHeuristic(startState.getHeuristic(goal));
 		startState.setF(startState.getF());
 		Vertex result;
-//		HashSet<Integer> closed = new HashSet<>();
 		PriorityQueue<Vertex> q = new PriorityQueue<>();
 		q.add(startState);
 		Vertex goalVertex = new Vertex(goal);
-//		while (!q.isEmpty()) {
-//			//TESTING: printing queue
-//			System.out.println("Queue:");
-//			for (Vertex i : q) {
-//				i.setHeuristic(i.getHeuristic(goal));
-//				i.setF(i.getF());
-//				System.out.println(Arrays.deepToString(i.getBoard()));
-//				System.out.println("Move: " + i.getMove());
-//				System.out.println("f value : " + i.getF());
-//				System.out.println("cost: " + i.getDistanceFromStart());
-//			}
-//			System.out.println("End queue");
-//			Vertex node = q.remove();
-//			if (solvable(node.getBoard())){
-//				if (node.getHashCode() == goalVertex.getHashCode()) {
-//					result = node;
-//					return result;
-//				}
-//
-//				closed.add(node.getHashCode());
-//
-//				for (Vertex neighbor : node.generateChild()) {
-//					if (closed.contains(neighbor.getHashCode())) {
-//						continue;
-//					}
-//					neighbor.setHeuristic(neighbor.getHeuristic(goal));
-//					neighbor.setF(neighbor.getF());
-//
-//					if (!closed.contains(neighbor.getHashCode())) {
-//						if (queueContains(q, neighbor)) {
-//							Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
-//							if (openNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
-//								q.remove(openNeighbor);
-//								neighbor.setParent(node);
-//								q.add(neighbor);
-//							}
-//						} else {
-//							neighbor.setParent(node);
-//							q.add(neighbor);
-//						}
-//					}
-//				}
-//			}
-//			else{
-//				System.out.println("unsolvable duma");
-//				System.out.println(Arrays.deepToString(node.getBoard()));
-//				System.out.println(node.getMove());
-//				System.out.println("----------------------------------------");
-//			}
-//		}
-//		return null;
-		HashMap<Integer, Integer> closed = new HashMap<>();
+		//<hashcode , F value>
+
+		HashMap<Long, Integer> closed = new HashMap<>();
 
 		while (!q.isEmpty()) {
+			System.out.println("queue size : " + q.size());
 			Vertex curr = q.remove();
-			if (solvable(curr.getBoard())) {
-
-				ArrayList<Vertex> neighbors = curr.generateChild();
+			ArrayList<Vertex> neighbors = curr.generateChild();
 //				System.out.println("---------------------------------------");
-				//for (Vertex u : neighbors) {
+			//for (Vertex u : neighbors) {
 //					System.out.print(u.getMove() + ": ");
 //					System.out.println(Arrays.deepToString(u.getBoard()));
-				//	u.setHeuristic(u.getHeuristic(goal));
-				//	u.setF(u.getF());
+			//	u.setHeuristic(u.getHeuristic(goal));
+			//	u.setF(u.getF());
 //						System.out.println("heuristic : " + u.getHeuristic(goal));
 //						System.out.println("cost : " + u.getDistanceFromStart());
 //						System.out.println("f value : " + u.getF());
-				//}
+			//}
 //				System.out.println("---------------------------------------");
-				for (Vertex u:neighbors) {
-					u.setHeuristic(u.getHeuristic(goal));
-					u.setF(u.getF());
-					if (u.getHashCode() == goalVertex.getHashCode()) {
-						u.setParent(curr);
-						result = u;
-						return result; // if the solution came out then return
-					} else {
-						if (q.contains(u)) {
-							for (Vertex i:q) {
-								if (i.getHashCode() == u.getHashCode() && i.getF() < u.getF()) {
-									i.setF(u.getF());
-									u.setParent(curr);
-								}
-							}
-						} else if (closed.containsKey(u.getHashCode())) {
+			for (Vertex neighbor:neighbors) {
 
-							if (closed.get(u.getHashCode()) > u.getF()) {
-								closed.put(u.getHashCode(), u.getF());
-								q.add(u);
-								u.setParent(curr);
-							}
-						} else {
-							q.add(u);
-							u.setParent(curr);
+				neighbor.setHeuristic(neighbor.getHeuristic(goal));
+				neighbor.setF(neighbor.getF());
+
+				if (neighbor.getHashCode() == goalVertex.getHashCode()) {
+					neighbor.setParent(curr);
+					result = neighbor;
+					return result; // if the solution came out then return
+				}
+				else {
+					Vertex inQueue = queueContains(q,neighbor);
+					if (inQueue != null) {//
+						if (inQueue.getF() > neighbor.getF()) {
+//								System.out.println("neighbor in queue code: "+ openNeighbor.getHashCode());
+//								System.out.println("i board: "+ Arrays.deepToString(openNeighbor.getBoard()));
+//								System.out.println("neighbor code: "+ neighbor.getHashCode());
+//								System.out.println("neighbor board: "+ Arrays.deepToString(neighbor.getBoard()));
+//									queueElement.setF(neighbor.getF());
+//									neighbor.setParent(curr); // change the value of the vertex in the piority queue, does it change the order?
+							// maybe we have to remove the node and then add it in
+							q.remove(inQueue);
+							neighbor.setParent(curr);
+							q.add(neighbor);
+
 						}
 					}
+					else if (closed.containsKey(neighbor.getHashCode())) {
+						if (closed.get(neighbor.getHashCode()) > neighbor.getF()) {
+							System.out.println("ahihi con cac du ma cay vai ca lone");
+							closed.put(neighbor.getHashCode(), neighbor.getF());
+							q.add(neighbor);
+							neighbor.setParent(curr);
+						}
+					}
+					else {
+						q.add(neighbor);
+						neighbor.setParent(curr);
+					}
 				}
-				closed.put(curr.getHashCode(), curr.getF());
-			} else {
-				System.out.println("DUMA UNSOLVABLE");
-				System.out.println(Arrays.deepToString(curr.getBoard()));
-				System.out.println(curr.getMove());
 			}
+			closed.put(curr.getHashCode(), curr.getF());
 
 		}
+		System.out.println("duma empty queue");
 		return null;
 	}
 }

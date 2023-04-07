@@ -1,0 +1,96 @@
+
+//		while (!q.isEmpty()) {
+//			//TESTING: printing queue
+//			System.out.println("Queue:");
+//			for (Vertex i : q) {
+//				i.setHeuristic(i.getHeuristic(goal));
+//				i.setF(i.getF());
+//				System.out.println(Arrays.deepToString(i.getBoard()));
+//				System.out.println("Move: " + i.getMove());
+//				System.out.println("f value : " + i.getF());
+//				System.out.println("cost: " + i.getDistanceFromStart());
+//			}
+//			System.out.println("End queue");
+//			Vertex node = q.remove();
+//			if (solvable(node.getBoard())){
+//				if (node.getHashCode() == goalVertex.getHashCode()) {
+//					result = node;
+//					return result;
+//				}
+//
+//				closed.add(node.getHashCode());
+//
+//				for (Vertex neighbor : node.generateChild()) {
+//					if (closed.contains(neighbor.getHashCode())) {
+//						continue;
+//					}
+//					neighbor.setHeuristic(neighbor.getHeuristic(goal));
+//					neighbor.setF(neighbor.getF());
+//
+//					if (!closed.contains(neighbor.getHashCode())) {
+//						if (queueContains(q, neighbor)) {
+//							Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
+//							if (openNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
+//								q.remove(openNeighbor);
+//								neighbor.setParent(node);
+//								q.add(neighbor);
+//							}
+//						} else {
+//							neighbor.setParent(node);
+//							q.add(neighbor);
+//						}
+//					}
+//				}
+//			}
+//			else{
+//				System.out.println("unsolvable duma");
+//				System.out.println(Arrays.deepToString(node.getBoard()));
+//				System.out.println(node.getMove());
+//				System.out.println("----------------------------------------");
+//			}
+//		}
+//		return null;
+
+
+    public static boolean solvable(int[][] arr2D)
+        {
+            int[] puzzle = new int[arr2D.length * arr2D[0].length];
+            int index = 0;
+            for (int i = 0; i < arr2D.length; i++) {
+                for (int j = 0; j < arr2D[0].length; j++) {
+                    puzzle[index++] = arr2D[i][j];
+                }
+            }
+            int parity = 0;
+            int gridWidth = (int) Math.sqrt(puzzle.length);
+            int row = 0; // the current row we are on
+            int blankRow = 0; // the row with the blank tile
+
+            for (int i = 0; i < puzzle.length; i++)
+            {
+                if (i % gridWidth == 0) { // advance to next row
+                    row++;
+                }
+                if (puzzle[i] == 0) { // the blank tile
+                    blankRow = row; // save the row on which encountered
+                    continue;
+                }
+                for (int j = i + 1; j < puzzle.length; j++)
+                {
+                    if (puzzle[i] > puzzle[j] && puzzle[j] != 0)
+                    {
+                        parity++;
+                    }
+                }
+            }
+
+            if (gridWidth % 2 == 0) { // even grid
+                if (blankRow % 2 == 0) { // blank on odd row; counting from bottom
+                    return parity % 2 == 0;
+                } else { // blank on even row; counting from bottom
+                    return parity % 2 != 0;
+                }
+            } else { // odd grid
+                return parity % 2 == 0;
+            }
+        }

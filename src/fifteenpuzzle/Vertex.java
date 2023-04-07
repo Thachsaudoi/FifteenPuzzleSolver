@@ -3,6 +3,9 @@ package fifteenpuzzle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Vertex implements Comparable<Vertex>{
     private int[][] board;
@@ -12,8 +15,10 @@ public class Vertex implements Comparable<Vertex>{
     private int[] blankPos;
     private String move;
     private Vertex parent;
-    private int hashCode = 0;
+    private long hashCode = 0;
     private int boardLength;
+
+
 
     public Vertex() {
 
@@ -27,14 +32,37 @@ public class Vertex implements Comparable<Vertex>{
         this.move = "";
         this.blankPos = new int[2];
         this.findBlankPos();
-        final int prime = 31;
-        this.hashCode = 17;
-        for (int[] row : this.board) {
-            for (int val : row) {
-                this.hashCode = 31 * this.hashCode + val;
-            }
+
+        this.hashCode = hash(board);
+//        for (int[] row : this.board) {
+//            for (int val : row) {
+//                this.hashCode = 31 * this.hashCode + val;
+//            }
+//        }
+    }
+    public static long hash(int[][] matrix) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = serializeMatrix(matrix);
+            byte[] hash = md.digest(bytes);
+            ByteBuffer buffer = ByteBuffer.wrap(hash);
+            return buffer.getLong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    private static byte[] serializeMatrix(int[][] matrix) {
+        ByteBuffer buffer = ByteBuffer.allocate(matrix.length * matrix[0].length * Integer.BYTES);
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                buffer.putInt(matrix[i][j]);
+            }
+        }
+        return buffer.array();
+    }
+
+
 
     public ArrayList<Vertex> generateChild() {
         int x = this.blankPos[0];
@@ -59,7 +87,7 @@ public class Vertex implements Comparable<Vertex>{
         return children;
     }
 
-    public int getHashCode() {
+    public long getHashCode() {
         return this.hashCode;
     }
 
