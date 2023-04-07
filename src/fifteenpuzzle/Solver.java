@@ -115,9 +115,11 @@ public class Solver {// the solver will input a board and result in movements
 	}
 
 	public static Vertex solve(int[][] start) {
+
 		Vertex startState = new Vertex(start);
 		startState.setHeuristic(startState.getHeuristic(goal));
 		startState.setF(startState.getF());
+
 		Vertex result;
 		PriorityQueue<Vertex> q = new PriorityQueue<>();
 		q.add(startState);
@@ -127,13 +129,28 @@ public class Solver {// the solver will input a board and result in movements
 
 		while (!q.isEmpty()) {
 			Vertex curr = q.remove();
+			System.out.println("move : " + curr.getMove() + "\n");
 			ArrayList<Vertex> neighbors = curr.generateChild();
+
+			System.out.println("\n/////////////////////////////////////////////////////////////");
+
+			for(Vertex i : neighbors){
+				System.out.println("neighbor's move : " + i.getMove());
+				System.out.println("neighbor F : " + i.getF()); // sum of distance from start and heuristic value
+				System.out.println("neighbor board : " + Arrays.deepToString(i.getBoard()));
+				System.out.println("neighbor cost : " + i.getDistanceFromStart());
+				System.out.println("\n");
+
+			}
+
+			System.out.println("\n/////////////////////////////////////////////////////////////");
+
+
 
 			for (Vertex neighbor:neighbors) {
 
 				neighbor.setHeuristic(neighbor.getHeuristic(goal));
 				neighbor.setF(neighbor.getF());
-
 				if (neighbor.getHashCode() == goalVertex.getHashCode()) {
 					neighbor.setParent(curr);
 					result = neighbor;

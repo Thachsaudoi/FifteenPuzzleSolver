@@ -11,7 +11,7 @@ public class Vertex implements Comparable<Vertex>{
     private int[][] board;
     private int heuristic;
     private int distanceFromStart;
-    private int f;// fi will be thie price of the
+    private int f;
     private int[] blankPos;
     private String move;
     private Vertex parent;
@@ -34,11 +34,6 @@ public class Vertex implements Comparable<Vertex>{
         this.findBlankPos();
 
         this.hashCode = hash(board);
-//        for (int[] row : this.board) {
-//            for (int val : row) {
-//                this.hashCode = 31 * this.hashCode + val;
-//            }
-//        }
     }
     public static long hash(int[][] matrix) {
         try {
