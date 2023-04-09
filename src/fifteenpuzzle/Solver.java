@@ -87,69 +87,57 @@ public class Solver {// the solver will input a board and result in movements
 	}
 
 	public static Vertex solve(int[][] start) {
-		Vertex startState = new Vertex(start);
-		startState.setHeuristic(startState.getHeuristic(goal));
-		startState.setF(startState.getF());
-		Vertex result;
-//		HashMap<Integer, Integer> closed = new HashMap<>();
-
-		//********** THIS IS WHERE A* STARTED*********************
-
-
-//		HashSet<Integer> closed = new HashSet<>();
-		HashMap<Integer,Integer> closed = new HashMap<>();
+		Vertex startState = new Vertex(start, goal);
+		HashMap<Integer,Vertex> closed = new HashMap<>();
+		HashSet<Integer> openStates = new HashSet<>();
 		PriorityQueue<Vertex> q = new PriorityQueue<>();
 		q.add(startState);
-		Vertex goalVertex = new Vertex(goal);
+		Vertex goalVertex = new Vertex(goal, goal);
+		openStates.add(startState.getHashCode());
 
-		int countPop = 0 ;
 		while (!q.isEmpty()) {
 			Vertex node = q.remove();
-			countPop++;
-			for (Vertex neighbor : node.generateChild()) {
-				neighbor.setHeuristic(neighbor.getHeuristic(goal));
-				neighbor.setF(neighbor.getF());
+////			System.out.println("Pop: " + node.getMove());
+			System.out.println(node.getF());
+			openStates.remove(node.getHashCode());
 
+			for (Vertex neighbor : node.generateChild()) {
 				if (neighbor.getHashCode() == goalVertex.getHashCode()) {
-					System.out.println("final count pop: "+ countPop);
 					System.out.println("count inside the hashset: "+ closed.size());
+					System.out.println("Final queue size: " + q.size());
 					neighbor.setParent(node);
 					return neighbor;
 				}
 
-				else{
-					if (queueContains(q, neighbor)) {
-						// it did go inside here
-						Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
-						if (openNeighbor.compareTo(neighbor) > 0) { // barely go inside here
-							System.out.println("hello world");
-							// the problem is the thing never go inside here
-							System.out.println("below");
-							System.out.println(openNeighbor.getF());
-							System.out.println(neighbor.getF());
-							q.remove(openNeighbor);
-							neighbor.setParent(node);
-							q.add(neighbor);
-
-						}
-					}
-					else if ( closed.containsKey(neighbor.getHashCode())){
-						// so if the one in the closed has higher fu then update the fu then move it back to the open queue
-						if (closed.get(neighbor.getHashCode()).compareTo(neighbor.getF())> 0){// barely go inside here
-							q.add(neighbor);
-							neighbor.setParent(node);
-							System.out.println("went here wentttt");
-						}
-
-					}
-					else {
+				Vertex closedNeighbor = null;
+				Vertex openNeighbor = null;
+				if (openStates.contains(neighbor.getHashCode())) {
+					openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
+					if (openNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
+						q.remove(openNeighbor);
 						neighbor.setParent(node);
 						q.add(neighbor);
 					}
 				}
-			}
-			closed.put(node.getHashCode(), node.getF()); // this line is moving node to the close set
+				else {
+					int neighborCode = neighbor.getHashCode();
+					if (closed.containsKey(neighborCode)) {
+						//Check if the next state is in the queue
+						closedNeighbor = closed.get(neighbor.getHashCode());
+						if(closedNeighbor.getDistanceFromStart() > neighbor.getDistanceFromStart()) {
+							closed.put(neighborCode, neighbor);
+						}
+					}
 
+				}
+				if (openNeighbor == null && closedNeighbor == null) {
+					q.add(neighbor);
+					neighbor.setParent(node);
+					openStates.add(neighbor.getHashCode());
+				}
+
+			}
+			closed.put(node.getHashCode(), node); // this line is moving node to the closed set
 		}
 		return null;
 	}
