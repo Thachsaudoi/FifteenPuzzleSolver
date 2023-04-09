@@ -119,76 +119,172 @@ public class Vertex implements Comparable<Vertex>{
         return this.f; // if we make constructor put this in.
     }
 
-    public int getConflicts() {
-        int n = this.board.length;
-        int conflicts = 0;
-        ArrayList<ArrayList<Integer>> lineArr = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            lineArr.add(new ArrayList<Integer>());
-        }
+    public static int linearConflict(int[][] board) {
+//        int size = board.length;
+//        int conflict = 0;
+//        for (int i = 0; i < size; i++) {
+//            int[] row = board[i];
+//            int[] goalRow = IntStream.range(i*size+1, (i+1)*size).toArray();
+//            for (int j = 0; j < size; j++) {
+//                if (row[j] != 0 && IntStream.of(goalRow).anyMatch(x -> x == row[j])) {
+//                    for (int k = j+1; k < size; k++) {
+//                        if (row[k] != 0 && IntStream.of(goalRow).anyMatch(x -> x == row[k]) && row[k] < row[j]) {
+//                            conflict++;
+//                            break;
+//                        }
+//                    }
+//                    for (int l = i+1; l < size; l++) {
+//                        int col = board[l][j];
+//                        if (col != 0 && IntStream.of(goalRow).anyMatch(x -> x == col) && col < row[j]) {
+//                            conflict++;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+        //}
+        int horizontalConflict = 0;
 
-        int[] goalIndices = new int[n * n];
-        int[] currIndices = new int[n * n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                goalIndices[goal[i][j]] = i * n + j;
-                currIndices[this.board[i][j]] = i * n + j;
-            }
-        }
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                int currLine = currIndices[this.board[i][j]] / n;
-                int goalLine = goalIndices[this.board[i][j]] / n;
-                if (currLine == goalLine) {
-                    lineArr.get(currLine).add(this.board[i][j]);
-                }
-            }
-        }
-
-        for (ArrayList<Integer> arr : lineArr) {
-            for (int i = 0; i < arr.size(); i++) {
-                for (int j = 0; j < i; j++) {
-                    if ((currIndices[arr.get(i)] - currIndices[arr.get(j)]) * (goalIndices[arr.get(i)] - goalIndices[arr.get(j)]) < 1) {
-                        conflicts++;
+        for (int i = 0; i < board.length; i++)
+        {
+            int max1 = -1;
+            for (int j = 0; j < board.length; j++)
+            {
+                int value1 = board[i][j];
+                if (value1 != 0 && value1 % board.length== i + 1)
+                {
+                    if (value1 > max1)
+                    {
+                        max1 = value1;
+                    }
+                    else
+                    {
+                        horizontalConflict += 2;
                     }
                 }
+
             }
+
         }
 
-        return conflicts;
-    }
 
+        int verticalConflict = 0;
 
-    public int getHeuristic() {
-        int heuristicCost = 0;
-        int numRows = this.board.length;
-        int numCols = this.board[0].length;
-        int idealRow;
-        int idealCol;
-        int currentRow;
-        int currentCol;
-        int value;
-
-        for (int row = 0; row < numRows; row++) {
-            for (int col = 0; col < numCols; col++) {
-                value = this.board[row][col];
-                if (value == 0) {
-                    continue;
+        for (int r = 0; r < board.length; r++)
+        {
+            int max2 = -1;
+            for (int c = 0; c < board.length; c++)
+            {
+                int value2 = board[r][c];
+                if (value2 != 0 && (value2 - 1) / board.length == r)
+                {
+                    if (value2 > max2)
+                    {
+                        max2 = value2;
+                    }
+                    else
+                    {
+                        verticalConflict += 2;
+                    }
                 }
 
-                idealRow = (value - 1) / numCols;
-                idealCol = (value - 1) % numCols;
-
-                currentRow = row;
-                currentCol = col;
-
-                heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
             }
-        }
 
-        return heuristicCost;
+        }
+        return horizontalConflict + verticalConflict;
     }
+    private int getHeuristic() {
+//        int distance = 0;
+//        for (int i = 0; i < state.length; i++) {
+//            if (state[i] == 0) {
+//                continue;
+//            }
+//            int rowDiff = Math.abs(i / 4 - (state[i] - 1) / 4);
+//            int colDiff = Math.abs(i % 4 - (state[i] - 1) % 4);
+//            distance += rowDiff + colDiff;
+//            // check for linear conflicts in row
+//            if (i / 4 == (state[i] - 1) / 4) {
+//                for (int j = i + 1; j < i / 4 * 4 + 4; j++) {
+//                    if (state[j] == 0 || state[j] / 4 != i / 4) {
+//                        continue;
+//                    }
+//                    if (state[i] > state[j] && (j - i) * (state[j] - 1 - i) > 0) {
+//                        distance += 2;
+//                    }
+//                }
+//            }
+//            // check for linear conflicts in column
+//            if (i % 4 == (state[i] - 1) % 4) {
+//                for (int j = i + 4; j < 16; j += 4) {
+//                    if (state[j] == 0 || state[j] % 4 != i % 4) {
+//                        continue;
+//                    }
+//                    if (state[i] > state[j] && (j - i) / 4 * (state[j] - 1 - i) > 0) {
+//                        distance += 2;
+//                    }
+//                }
+//            }
+//        }
+
+            int heuristicCost = 0;
+            int numRows = this.board.length;
+            int numCols = this.board[0].length;
+            int idealRow;
+            int idealCol;
+            int currentRow;
+            int currentCol;
+            int value;
+
+            for (int row = 0; row < numRows; row++) {
+                for (int col = 0; col < numCols; col++) {
+                    value = this.board[row][col];
+                    if (value == 0) {
+                        continue;
+                    }
+
+                    idealRow = (value - 1) / numCols;
+                    idealCol = (value - 1) % numCols;
+
+                    currentRow = row;
+                    currentCol = col;
+
+                    heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
+                }
+            }
+
+
+        return heuristicCost + linearConflict(board);
+    }
+
+//    public int getHeuristic() {
+//        int heuristicCost = 0;
+//        int numRows = this.board.length;
+//        int numCols = this.board[0].length;
+//        int idealRow;
+//        int idealCol;
+//        int currentRow;
+//        int currentCol;
+//        int value;
+//
+//        for (int row = 0; row < numRows; row++) {
+//            for (int col = 0; col < numCols; col++) {
+//                value = this.board[row][col];
+//                if (value == 0) {
+//                    continue;
+//                }
+//
+//                idealRow = (value - 1) / numCols;
+//                idealCol = (value - 1) % numCols;
+//
+//                currentRow = row;
+//                currentCol = col;
+//
+//                heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
+//            }
+//        }
+//
+//        return heuristicCost;
+//    }
 //    public  int getHeuristic(int[][] goal) {
 //        int distance = 0;
 //        int n = board.length;
