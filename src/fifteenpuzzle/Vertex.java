@@ -20,7 +20,7 @@ public class Vertex implements Comparable<Vertex>{
 
     }
 
-    public Vertex(int[][] board, int[][] goal)  {
+    public Vertex(int[][] board)  {
         this.board = board;
         this.goal = goal;
         this.boardLength = this.board.length;
@@ -50,7 +50,7 @@ public class Vertex implements Comparable<Vertex>{
         for (int i = 0; i < moveLength; i++) {
             int[][] child = this.shuffle(x, y, moves[i][0], moves[i][1]);
             if (child != null) {
-                Vertex childVertex = new Vertex(child, this.goal);
+                Vertex childVertex = new Vertex(child);
                 String m = this.board[moves[i][0]][moves[i][1]] + " " + strMoves[i];
                 childVertex.setMove(m);
                 childVertex.setDist(this.distanceFromStart + 1);

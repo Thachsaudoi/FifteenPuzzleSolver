@@ -87,18 +87,18 @@ public class Solver {// the solver will input a board and result in movements
 	}
 
 	public static Vertex solve(int[][] start) {
-		Vertex startState = new Vertex(start, goal);
+		Vertex startState = new Vertex(start);
 		HashMap<Integer,Vertex> closed = new HashMap<>();
 		HashSet<Integer> openStates = new HashSet<>();
 		PriorityQueue<Vertex> q = new PriorityQueue<>();
 		q.add(startState);
-		Vertex goalVertex = new Vertex(goal, goal);
+		Vertex goalVertex = new Vertex(goal);
 		openStates.add(startState.getHashCode());
 
 		while (!q.isEmpty()) {
 			Vertex node = q.remove();
 ////			System.out.println("Pop: " + node.getMove());
-			System.out.println(node.getF());
+//			System.out.println(node.getF());
 			openStates.remove(node.getHashCode());
 
 			for (Vertex neighbor : node.generateChild()) {
