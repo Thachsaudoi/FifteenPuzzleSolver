@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class Vertex implements Comparable<Vertex>{
     private int[][] board;
     private int heuristic;
-    private int distanceFromStart;
+
     private int f;// fi will be thie price of the
     private int[] blankPos;
     private String move;
@@ -22,7 +22,6 @@ public class Vertex implements Comparable<Vertex>{
     public Vertex(int[][] board)  {
         this.board = board;
         this.boardLength = this.board.length;
-        this.distanceFromStart = 0;
         this.heuristic = 0;
         this.move = "";
         this.blankPos = new int[2];
@@ -50,7 +49,6 @@ public class Vertex implements Comparable<Vertex>{
                 Vertex childVertex = new Vertex(child);
                 String m = this.board[moves[i][0]][moves[i][1]] + " " + strMoves[i];
                 childVertex.setMove(m);
-                childVertex.setDist(this.distanceFromStart + 1);
                 children.add(childVertex);
             }
 
@@ -63,9 +61,7 @@ public class Vertex implements Comparable<Vertex>{
         return this.hashCode;
     }
 
-    public int getDistanceFromStart() {
-        return this.distanceFromStart;
-    }
+
     public void setMove(String move) {
         this.move = move;
     }
@@ -83,9 +79,7 @@ public class Vertex implements Comparable<Vertex>{
         return this.parent;
     }
 
-    public void setDist(int newDist) {
-        this.distanceFromStart = newDist;
-    }
+
 
 
     public void setF(int f) {
@@ -131,31 +125,35 @@ public class Vertex implements Comparable<Vertex>{
         }
         return null;
     }
-    public  int getHeuristic(int[][] goal) {
-        int distance = 0;
-        int n = board.length;
-        HashMap<Integer, int[]> goalPositions = new HashMap<>();
 
-        // Store the goal positions of each number in a map for O(1) lookup
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                goalPositions.put(goal[i][j], new int[]{i, j});
-            }
-        }
+    public int getHeuristic() {
+        int heuristicCost = 0;
+        int numRows = this.board.length;
+        int numCols = this.board[0].length;
+        int idealRow;
+        int idealCol;
+        int currentRow;
+        int currentCol;
+        int value;
 
-        // Calculate the Manhattan distance for each number on the board
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                int num = board[i][j];
-                if (num == 0) {
+        for (int row = 0; row < numRows; row++) {
+            for (int col = 0; col < numCols; col++) {
+                value = this.board[row][col];
+                if (value == 0) {
                     continue;
                 }
-                int[] goalPos = goalPositions.get(num);
-                distance += Math.abs(i - goalPos[0]) + Math.abs(j - goalPos[1]);
+
+                idealRow = (value - 1) / numCols;
+                idealCol = (value - 1) % numCols;
+
+                currentRow = row;
+                currentCol = col;
+
+                heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
             }
         }
 
-        return distance;
+        return heuristicCost;
     }
 
     @Override
@@ -190,14 +188,6 @@ public class Vertex implements Comparable<Vertex>{
     @Override
     public int compareTo(Vertex other) {
 
-        if (other.f == this.f) {
-//          System.out.println("other f " + other.f + " this f " + this.f);
-//          System.out.println(" this get dist " + this.getDistanceFromStart() + " , other get dist " + other.getDistanceFromStart());
-//          System.out.println(Integer.compare(this.getDistanceFromStart(), other.getDistanceFromStart()));
-            return Integer.compare(this.getDistanceFromStart(), other.getDistanceFromStart());
-        }
-
-//        return other.f < this.f ? 1 : -1;
         return Integer.compare(this.getF(), other.getF());
     }
 

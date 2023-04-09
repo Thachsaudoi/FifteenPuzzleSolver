@@ -88,7 +88,7 @@ public class Solver {// the solver will input a board and result in movements
 
 	public static Vertex solve(int[][] start) {
 		Vertex startState = new Vertex(start);
-		startState.setHeuristic(startState.getHeuristic(goal));
+		startState.setHeuristic(startState.getHeuristic());
 		startState.setF(startState.getF());
 		Vertex result;
 //		HashMap<Integer, Integer> closed = new HashMap<>();
@@ -107,7 +107,7 @@ public class Solver {// the solver will input a board and result in movements
 			Vertex node = q.remove();
 			countPop++;
 			for (Vertex neighbor : node.generateChild()) {
-				neighbor.setHeuristic(neighbor.getHeuristic(goal));
+				neighbor.setHeuristic(neighbor.getHeuristic());
 				neighbor.setF(neighbor.getF());
 
 				if (neighbor.getHashCode() == goalVertex.getHashCode()) {
@@ -122,11 +122,6 @@ public class Solver {// the solver will input a board and result in movements
 						// it did go inside here
 						Vertex openNeighbor = q.stream().filter(n -> n.equals(neighbor)).findFirst().get();
 						if (openNeighbor.compareTo(neighbor) > 0) { // barely go inside here
-							System.out.println("hello world");
-							// the problem is the thing never go inside here
-							System.out.println("below");
-							System.out.println(openNeighbor.getF());
-							System.out.println(neighbor.getF());
 							q.remove(openNeighbor);
 							neighbor.setParent(node);
 							q.add(neighbor);
