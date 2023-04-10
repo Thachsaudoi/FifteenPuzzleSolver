@@ -112,14 +112,11 @@ public class Solver {// the solver will input a board and result in movements
 
 		while (!q.isEmpty()) {
 			Vertex node = q.remove();
-////			System.out.println("Pop: " + node.getMove());
 			System.out.println(node.getF());
 			openStates.remove(node.getHashCode());
 
 			for (Vertex neighbor : node.generateChild()) {
 				if (neighbor.getHashCode() == goalVertex.getHashCode()) {
-					System.out.println("count inside the hashset: "+ closed.size());
-					System.out.println("Final queue size: " + q.size());
 					neighbor.setParent(node);
 					return neighbor;
 				}

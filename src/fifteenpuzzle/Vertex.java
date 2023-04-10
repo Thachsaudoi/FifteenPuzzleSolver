@@ -1,8 +1,6 @@
 package fifteenpuzzle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 public class Vertex implements Comparable<Vertex>{
     private int[][] board;
@@ -23,6 +21,7 @@ public class Vertex implements Comparable<Vertex>{
     public Vertex(int[][] board)  {
         this.board = board;
         this.goal = goal;
+        this.parent = null;
         this.boardLength = this.board.length;
         this.distanceFromStart = 0;
         this.heuristic = this.calculate();
@@ -30,7 +29,7 @@ public class Vertex implements Comparable<Vertex>{
         this.blankPos = new int[2];
         this.findBlankPos();
         final int prime = 31;
-        this.hashCode = 17;
+        this.hashCode = 3;
         for (int[] row : this.board) {
             for (int val : row) {
                 this.hashCode = prime * this.hashCode + val;
@@ -118,7 +117,6 @@ public class Vertex implements Comparable<Vertex>{
     public int getF() {
         return this.f; // if we make constructor put this in.
     }
-
     private int getConflicts(int[][] rowConflict, int[][] columnConflict) {
         int rowConflicts = 0;
         int columnConflicts = 0;
@@ -146,7 +144,27 @@ public class Vertex implements Comparable<Vertex>{
     }
 
 
+    public int misplacedTiles() {
+        int count = 0;
+        int goalValue = 1;
 
+        // Loop through each tile on the board.
+        for (int row = 0; row < this.boardLength; row++) {
+            for (int col = 0; col < this.boardLength; col++) {
+                // Check if the tile is in the correct position.
+                if (this.board[row][col] != goalValue) {
+                    count++;
+                }
+                goalValue++;
+                if (goalValue == this.boardLength * this.boardLength) {
+                    goalValue = 0;
+                }
+            }
+        }
+
+        // Subtract 1 from the count to exclude the empty tile.
+        return count - 1;
+    }
     public int calculate() {
         //indicates a tile which is not in goal tile
         int[][] rowConflict = new int[this.boardLength][this.boardLength];
@@ -164,7 +182,24 @@ public class Vertex implements Comparable<Vertex>{
                 }
             }
         }
-        return getManhattan() + getConflicts(rowConflict,columnConflict);
+        return getManhattan() + (2 * getConflicts(rowConflict, columnConflict)) + 2 * getECL() + misplacedTiles();
+    }
+
+    public int getECL() {
+        int distance = 0;
+
+        for (int i = 0; i < this.boardLength; i++) {
+            for (int j = 0; j < this.boardLength; j++) {
+                int value = this.board[i][j];
+                if (value != 0) {
+                    int goal_row = (value - 1) / this.boardLength;
+                    int goal_col = (value - 1) % this.boardLength;
+                    distance += Math.sqrt(Math.pow(i - goal_row, 2) + Math.pow(j - goal_col, 2));
+                }
+            }
+        }
+
+        return distance;
     }
 
 
@@ -184,8 +219,6 @@ public class Vertex implements Comparable<Vertex>{
                 }
             }
         }
-//        System.out.println("board : " + Arrays.deepToString(board));
-//        System.out.println("heuristic cost : "+ distance) ;
 
         return distance;
     }
