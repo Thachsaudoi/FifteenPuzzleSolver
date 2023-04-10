@@ -1,4 +1,3 @@
-
 package fifteenpuzzle;
 
 import java.io.BufferedReader;
@@ -12,11 +11,25 @@ import java.util.PriorityQueue;
 
 
 public class Solver {// the solver will input a board and result in movements
-	// piorityQueue;
-	public static int SIZE; // the size of the board
+	public static int SIZE; //the dimension of the board
 	public static int[][] goal;
 
 	public static void main(String[] args) throws BadBoardException, IOException {
+
+		long startTime = System.currentTimeMillis();
+
+		System.out.println("number of arguments: " + args.length);
+		for (int i = 0; i < args.length; i++) {
+			System.out.println(args[i]);
+		}
+
+		if (args.length < 2) {
+			System.out.println("File names are not specified");
+			System.out.println("usage: java " + MethodHandles.lookup().lookupClass().getName() + " input_file output_file");
+			return;
+		}
+
+
 
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
 		SIZE = (int) br.read() -'0';
@@ -48,6 +61,7 @@ public class Solver {// the solver will input a board and result in movements
 		goal = new int[SIZE][SIZE];
 		int index = 1;
 
+		//creating the goal board
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
 				if (i == SIZE - 1 && j == SIZE - 1) {
@@ -59,32 +73,33 @@ public class Solver {// the solver will input a board and result in movements
 			}
 		}
 
+
 		Vertex b = solve(board);
+
 		Stack<String> resultList = new Stack<>();
-		while (b.getParent() != null) {
+		while (b != null) {
 			resultList.add(b.getMove());
 			b = b.getParent();
 		}
-		System.out.println("solution in main : ");
-		System.out.println("solution is missing the last element");
+		resultList.pop();
+
+		System.out.println("\nSOLUTION : ");
 		while (!resultList.isEmpty()) {
 			System.out.println(resultList.pop());
 		}
 
-		//File input = new File(args[0]);
-		// solve..
-		//File output = new File(args[1]);
 
-	}
-
-	public static boolean queueContains(PriorityQueue<Vertex> queue, Vertex neighbor) {
-		for (Vertex i : queue) {
-			if (neighbor.equals(i)) {
-				return true;
-			}
+		//calculating run time
+		long endTime = System.currentTimeMillis();
+		long runtime = endTime - startTime;
+		if (runtime > 30000) {
+			System.out.println("run time exceeed");
+			return;
 		}
-		return false;
+		System.out.println("Runtime: " + runtime + "ms");
 	}
+
+
 
 	public static Vertex solve(int[][] start) {
 		Vertex startState = new Vertex(start);
@@ -98,7 +113,7 @@ public class Solver {// the solver will input a board and result in movements
 		while (!q.isEmpty()) {
 			Vertex node = q.remove();
 ////			System.out.println("Pop: " + node.getMove());
-//			System.out.println(node.getF());
+			System.out.println(node.getF());
 			openStates.remove(node.getHashCode());
 
 			for (Vertex neighbor : node.generateChild()) {

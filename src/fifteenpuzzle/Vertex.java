@@ -2,7 +2,7 @@ package fifteenpuzzle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.HashMap;
 
 public class Vertex implements Comparable<Vertex>{
     private int[][] board;
@@ -25,7 +25,7 @@ public class Vertex implements Comparable<Vertex>{
         this.goal = goal;
         this.boardLength = this.board.length;
         this.distanceFromStart = 0;
-        this.heuristic = this.getHeuristic();
+        this.heuristic = this.calculate();
         this.move = "";
         this.blankPos = new int[2];
         this.findBlankPos();
@@ -119,198 +119,76 @@ public class Vertex implements Comparable<Vertex>{
         return this.f; // if we make constructor put this in.
     }
 
-    public static int linearConflict(int[][] board) {
-//        int size = board.length;
-//        int conflict = 0;
-//        for (int i = 0; i < size; i++) {
-//            int[] row = board[i];
-//            int[] goalRow = IntStream.range(i*size+1, (i+1)*size).toArray();
-//            for (int j = 0; j < size; j++) {
-//                if (row[j] != 0 && IntStream.of(goalRow).anyMatch(x -> x == row[j])) {
-//                    for (int k = j+1; k < size; k++) {
-//                        if (row[k] != 0 && IntStream.of(goalRow).anyMatch(x -> x == row[k]) && row[k] < row[j]) {
-//                            conflict++;
-//                            break;
-//                        }
-//                    }
-//                    for (int l = i+1; l < size; l++) {
-//                        int col = board[l][j];
-//                        if (col != 0 && IntStream.of(goalRow).anyMatch(x -> x == col) && col < row[j]) {
-//                            conflict++;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-        //}
-        int horizontalConflict = 0;
-
-        for (int i = 0; i < board.length; i++)
-        {
-            int max1 = -1;
-            for (int j = 0; j < board.length; j++)
-            {
-                int value1 = board[i][j];
-                if (value1 != 0 && value1 % board.length== i + 1)
-                {
-                    if (value1 > max1)
-                    {
-                        max1 = value1;
-                    }
-                    else
-                    {
-                        horizontalConflict += 2;
+    private int getConflicts(int[][] rowConflict, int[][] columnConflict) {
+        int rowConflicts = 0;
+        int columnConflicts = 0;
+        for (int i = 0; i < this.boardLength; i++) {
+            for (int j = 0; j < this.boardLength - 1; j++) {
+                //get row conflicts
+                if (rowConflict[i][j] == i) {
+                    for (int k = j + 1; k < this.boardLength; k++) {
+                        if (this.board[i][j] > this.board[i][k] && rowConflict[i][k] == i) {
+                            rowConflicts += 2;
+                        }
                     }
                 }
-
+                //get column conflicts
+                if (columnConflict[i][j] == j) {
+                    for (int k = i + 1; k < this.boardLength; k++) {
+                        if (this.board[i][j] > this.board[k][j] && columnConflict[k][j] == j) {
+                            columnConflicts += 2;
+                        }
+                    }
+                }
             }
-
         }
-
-
-        int verticalConflict = 0;
-
-        for (int r = 0; r < board.length; r++)
-        {
-            int max2 = -1;
-            for (int c = 0; c < board.length; c++)
-            {
-                int value2 = board[r][c];
-                if (value2 != 0 && (value2 - 1) / board.length == r)
-                {
-                    if (value2 > max2)
-                    {
-                        max2 = value2;
-                    }
-                    else
-                    {
-                        verticalConflict += 2;
-                    }
-                }
-
-            }
-
-        }
-        return horizontalConflict + verticalConflict;
-    }
-    private int getHeuristic() {
-//        int distance = 0;
-//        for (int i = 0; i < state.length; i++) {
-//            if (state[i] == 0) {
-//                continue;
-//            }
-//            int rowDiff = Math.abs(i / 4 - (state[i] - 1) / 4);
-//            int colDiff = Math.abs(i % 4 - (state[i] - 1) % 4);
-//            distance += rowDiff + colDiff;
-//            // check for linear conflicts in row
-//            if (i / 4 == (state[i] - 1) / 4) {
-//                for (int j = i + 1; j < i / 4 * 4 + 4; j++) {
-//                    if (state[j] == 0 || state[j] / 4 != i / 4) {
-//                        continue;
-//                    }
-//                    if (state[i] > state[j] && (j - i) * (state[j] - 1 - i) > 0) {
-//                        distance += 2;
-//                    }
-//                }
-//            }
-//            // check for linear conflicts in column
-//            if (i % 4 == (state[i] - 1) % 4) {
-//                for (int j = i + 4; j < 16; j += 4) {
-//                    if (state[j] == 0 || state[j] % 4 != i % 4) {
-//                        continue;
-//                    }
-//                    if (state[i] > state[j] && (j - i) / 4 * (state[j] - 1 - i) > 0) {
-//                        distance += 2;
-//                    }
-//                }
-//            }
-//        }
-
-            int heuristicCost = 0;
-            int numRows = this.board.length;
-            int numCols = this.board[0].length;
-            int idealRow;
-            int idealCol;
-            int currentRow;
-            int currentCol;
-            int value;
-
-            for (int row = 0; row < numRows; row++) {
-                for (int col = 0; col < numCols; col++) {
-                    value = this.board[row][col];
-                    if (value == 0) {
-                        continue;
-                    }
-
-                    idealRow = (value - 1) / numCols;
-                    idealCol = (value - 1) % numCols;
-
-                    currentRow = row;
-                    currentCol = col;
-
-                    heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
-                }
-            }
-
-
-        return heuristicCost + linearConflict(board);
+        return rowConflicts + columnConflicts;
     }
 
-//    public int getHeuristic() {
-//        int heuristicCost = 0;
-//        int numRows = this.board.length;
-//        int numCols = this.board[0].length;
-//        int idealRow;
-//        int idealCol;
-//        int currentRow;
-//        int currentCol;
-//        int value;
-//
-//        for (int row = 0; row < numRows; row++) {
-//            for (int col = 0; col < numCols; col++) {
-//                value = this.board[row][col];
-//                if (value == 0) {
-//                    continue;
-//                }
-//
-//                idealRow = (value - 1) / numCols;
-//                idealCol = (value - 1) % numCols;
-//
-//                currentRow = row;
-//                currentCol = col;
-//
-//                heuristicCost += Math.abs(idealRow - currentRow) + Math.abs(idealCol - currentCol);
-//            }
-//        }
-//
-//        return heuristicCost;
-//    }
-//    public  int getHeuristic(int[][] goal) {
-//        int distance = 0;
-//        int n = board.length;
-//        HashMap<Integer, int[]> goalPositions = new HashMap<>();
-//
-//        // Store the goal positions of each number in a map for O(1) lookup
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < n; j++) {
-//                goalPositions.put(goal[i][j], new int[]{i, j});
-//            }
-//        }
-//
-//        // Calculate the Manhattan distance for each number on the board
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < n; j++) {
-//                int num = board[i][j];
-//                if (num == 0) {
-//                    continue;
-//                }
-//                int[] goalPos = goalPositions.get(num);
-//                distance += Math.abs(i - goalPos[0]) + Math.abs(j - goalPos[1]);
-//            }
-//        }
-//
-//        return distance;
-//    }
+
+
+    public int calculate() {
+        //indicates a tile which is not in goal tile
+        int[][] rowConflict = new int[this.boardLength][this.boardLength];
+        int[][] columnConflict = new int[this.boardLength][this.boardLength];
+        for (int i = 0; i < this.boardLength; i++) {
+            for (int j = 0; j < this.boardLength; j++) {
+                //set goal row and column of tile
+                if (this.board[i][j] != 0) {
+                    rowConflict[i][j] = (this.board[i][j] - 1) / this.boardLength;
+                    columnConflict[i][j] = (this.board[i][j] - 1) % this.boardLength;
+                } else {
+                    //indicates the blank tile with -1 to ensure blank tile is not counted as conflict
+                    rowConflict[i][j] = -1;
+                    columnConflict[i][j] = -1;
+                }
+            }
+        }
+        return getManhattan() + getConflicts(rowConflict,columnConflict);
+    }
+
+
+
+    public int getManhattan() {
+        int distance = 0;
+
+
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                int value = board[i][j];
+
+                if (value != 0) {
+                    int targetI = (value - 1) / board.length;
+                    int targetJ = (value - 1) % board.length;
+                    distance += Math.abs(i - targetI) + Math.abs(j - targetJ);
+                }
+            }
+        }
+//        System.out.println("board : " + Arrays.deepToString(board));
+//        System.out.println("heuristic cost : "+ distance) ;
+
+        return distance;
+    }
 
     @Override
     public boolean equals(Object other) {
